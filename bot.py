@@ -4,10 +4,9 @@ import pytz
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-# --- KENDİ API BİLGİLERİNİZİ BURAYA YAZIN ---
-TELEGRAM_TOKEN = "BURAYA_TELEGRAM_BOT_TOKEN_YAZIN"
-WEATHER_API_KEY = "BURAYA_OPENWEATHERMAP_API_KEY_YAZIN"
-DEFAULT_CITY = "Istanbul"
+TELEGRAM_TOKEN = "8806690662:AAGKnoR5LJaEqZkK-nIiP0eyve6X0QrxGS8"
+WEATHER_API_KEY = "358c46403a373181ef7d0fb0f1b633c8"
+DEFAULT_CITY = "Vienna"
 
 def get_weather_and_outfit(city: str):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER_API_KEY}&units=metric&lang=tr"
@@ -22,7 +21,6 @@ def get_weather_and_outfit(city: str):
     wind_speed = round(response["wind"]["speed"] * 3.6)
     humidity = response["main"]["humidity"]
 
-    # Sıcaklığa göre kıyafet
     if temp < 5:
         outfit = "🧥 *Sıcaklık:* Kalın mont, kazak ve termal içlik tercih etmelisin."
     elif 5 <= temp < 15:
@@ -32,7 +30,6 @@ def get_weather_and_outfit(city: str):
     else:
         outfit = "👕 *Sıcaklık:* İnce tişört, şort veya ferah kıyafetler giyebilirsin."
 
-    # Ekipman tavsiyeleri
     equipments = []
     if weather_main == "clear" or "açık" in desc:
         equipments.append("🕶️ Güneş gözlüğünü yanına almayı unutma!")
@@ -75,7 +72,7 @@ async def send_daily_notification(context: ContextTypes.DEFAULT_TYPE):
 
 async def bildirim(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
-    tz = pytz.timezone("Europe/Istanbul")
+    tz = pytz.timezone("Europe/Vienna")
     target_time = datetime.time(hour=5, minute=50, second=0, tzinfo=tz)
 
     current_jobs = context.job_queue.get_jobs_by_name(str(chat_id))
@@ -88,11 +85,12 @@ async def bildirim(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=chat_id,
         name=str(chat_id)
     )
-    await update.message.reply_text("✅ Günlük bildirimler her sabah saat 05:50 (TSI) olarak ayarlandı!")
+    await update.message.reply_text("✅ Günlük bildirimler Viyana saatiyle her sabah saat 05:50 olarak ayarlandı!")
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("hava", hava))
     app.add_handler(CommandHandler("bildirim", bildirim))
+    print("WetterV_bot çalışıyor...")
     app.run_polling()
